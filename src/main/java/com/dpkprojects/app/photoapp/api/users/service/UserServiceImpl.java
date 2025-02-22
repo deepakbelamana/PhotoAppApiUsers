@@ -26,9 +26,12 @@ public class UserServiceImpl implements UserService {
 		
 		UserEntity userEntity = modelMapper.map(userDetails, UserEntity.class);
 		userEntity.setEncryptedPassword("test");
-		
 		userRepo.save(userEntity);
-		return null;
+		
+		UserDto userDto = modelMapper.map(userEntity, UserDto.class);
+	
+		
+		return userDto;
 	}
 
 }
