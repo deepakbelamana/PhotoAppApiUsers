@@ -39,6 +39,7 @@ public class UsersController {
 	public ResponseEntity<CreateUserResponseModel> createUser(@Valid @RequestBody CreateUserRequestModel userDetails) {
 		
 		ModelMapper modelMapper = new ModelMapper();
+		System.out.println(env.getProperty("gateway.ip"));
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		
 		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
