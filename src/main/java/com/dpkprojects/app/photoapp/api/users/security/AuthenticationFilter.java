@@ -26,6 +26,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         try {
             LoginRequestModel creds = new ObjectMapper()
                     .readValue(req.getInputStream(), LoginRequestModel.class);
+            //this will try to authenticate with the user credentials
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             creds.getEmail(),
