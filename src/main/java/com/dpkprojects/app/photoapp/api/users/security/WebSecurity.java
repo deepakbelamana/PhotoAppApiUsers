@@ -1,5 +1,6 @@
 package com.dpkprojects.app.photoapp.api.users.security;
 
+import com.dpkprojects.app.photoapp.api.users.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import jakarta.annotation.security.PermitAll;
@@ -23,7 +25,11 @@ public class WebSecurity {
 
 
     private Environment environment;
+	@Autowired
+	private UserService userService;
 
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     public WebSecurity(Environment environment) {
         this.environment = environment;
@@ -31,8 +37,12 @@ public class WebSecurity {
 
     @Bean //spring boot will calls this method automatically whenever needed
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+
 		//creating authentication manager object
 		AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+
+		authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
+
 		AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
 		http.csrf().disable();
@@ -43,7 +53,8 @@ public class WebSecurity {
 				)
 				.requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
 				.and()
-				.addFilter(new AuthenticationFilter(authenticationManager))  //registering AuthenticationFilter class
+				.addFilter(new AuthenticationFilter(authenticationManager,
+						userService,environment))  //registering AuthenticationFilter class
 				.authenticationManager(authenticationManager) //making it as default authentication manager
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
