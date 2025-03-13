@@ -4,6 +4,8 @@ import com.dpkprojects.app.photoapp.api.users.service.UserService;
 import com.dpkprojects.app.photoapp.api.users.shared.UserDto;
 import com.dpkprojects.app.photoapp.api.users.ui.model.LoginRequestModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,8 +18,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -63,5 +69,26 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         //the auth gives the user details
        String userName = ((User)auth.getPrincipal()).getUsername();
         UserDto userDto = userService.getUserDetailsByEmail(userName);
+
+        //encoding secret key
+        String tokenSecretKey = environment.getProperty("token.secret_key");
+        byte[] byteSecretKey = Base64.getEncoder().encode(tokenSecretKey.getBytes());
+        SecretKey secretKey = Keys.hmacShaKeyFor(byteSecretKey);
+
+        Instant now = Instant.now();
+
+        //generating token
+        String jwtToken = Jwts.builder()
+                .subject(userDto.getUserId())
+                .expiration(Date.from(now.
+                        plusMillis(Long.parseLong(environment.
+                                getProperty("token.expiration_milli_seconds")))))
+                .issuedAt(Date.from(now))
+                .signWith(secretKey)
+                .compact();
+
+        //adding token to the response header
+        res.addHeader("token",jwtToken);
+        res.addHeader("userId",userDto.getUserId());
     }
 }
