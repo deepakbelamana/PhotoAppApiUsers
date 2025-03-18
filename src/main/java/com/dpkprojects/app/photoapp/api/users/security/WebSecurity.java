@@ -25,11 +25,12 @@ public class WebSecurity {
 
 
     private Environment environment;
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Autowired
     public WebSecurity(Environment environment) {
         this.environment = environment;
@@ -38,28 +39,31 @@ public class WebSecurity {
     @Bean //spring boot will calls this method automatically whenever needed
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-		//creating authentication manager object
-		AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        //creating authentication manager object
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
 
-		authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
+        authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
 
-		AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+        AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+        //custom url authentication filter , and setup custom url for login
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(
+				authenticationManager, userService, environment);
+				authenticationFilter.setFilterProcessesUrl(environment.getProperty("login.url.path"));
 
-		http.csrf().disable();
-		http.authorizeHttpRequests()
-				.requestMatchers(HttpMethod.POST, "/users").access(
-						//allow requests from spring cloud api gateway only
-						new WebExpressionAuthorizationManager("hasIpAddress('" + environment.getProperty("gateway.ip") + "')")
-				)
-				.requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
-				.and()
-				.addFilter(new AuthenticationFilter(authenticationManager,
-						userService,environment))  //registering AuthenticationFilter class
-				.authenticationManager(authenticationManager) //making it as default authentication manager
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf().disable();
+        http.authorizeHttpRequests()
+                .requestMatchers(HttpMethod.POST, "/users").access(
+                        //allow requests from spring cloud api gateway only
+                        new WebExpressionAuthorizationManager("hasIpAddress('" + environment.getProperty("gateway.ip") + "')")
+                )
+                .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
+                .and()
+                .addFilter(authenticationFilter)  //registering AuthenticationFilter class
+                .authenticationManager(authenticationManager) //making it as default authentication manager
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-		http.headers().frameOptions().disable();
+        http.headers().frameOptions().disable();
 
-		return http.build();
+        return http.build();
     }
 }
