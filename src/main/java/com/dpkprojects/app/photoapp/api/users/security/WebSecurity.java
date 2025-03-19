@@ -56,6 +56,7 @@ public class WebSecurity {
                         //allow requests from spring cloud api gateway only
                         new WebExpressionAuthorizationManager("hasIpAddress('" + environment.getProperty("gateway.ip") + "')")
                 )
+                .requestMatchers(new AntPathRequestMatcher("/users/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                 .and()
                 .addFilter(authenticationFilter)  //registering AuthenticationFilter class
