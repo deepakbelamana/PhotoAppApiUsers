@@ -52,10 +52,7 @@ public class WebSecurity {
 
         http.csrf().disable();
         http.authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/users").access(
-                        //allow requests from spring cloud api gateway only
-                        new WebExpressionAuthorizationManager("hasIpAddress('" + environment.getProperty("gateway.ip") + "')")
-                )
+                .requestMatchers(HttpMethod.POST, "/users").permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/users/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                 .and()
