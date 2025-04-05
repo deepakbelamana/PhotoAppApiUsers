@@ -30,7 +30,7 @@ public class UsersController {
 	@Autowired
 	private UserService userService;
 
-	@GetMapping("/status")
+	@GetMapping("/status/check")
 	public String checkStatus() {
 		return "working on port " + env.getProperty("local.server.port");
 	}
