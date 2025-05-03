@@ -55,6 +55,7 @@ public class WebSecurity {
                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/users/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
                 .and()
                 .addFilter(authenticationFilter)  //registering AuthenticationFilter class
                 .authenticationManager(authenticationManager) //making it as default authentication manager
