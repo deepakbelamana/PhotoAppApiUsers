@@ -1,6 +1,9 @@
 package com.dpkprojects.app.photoapp.api.users.shared;
 
+import com.dpkprojects.app.photoapp.api.users.ui.model.album.AlbumResponseModel;
+
 import java.io.Serializable;
+import java.util.List;
 
 public class UserDto implements Serializable{
 	/**
@@ -14,6 +17,15 @@ public class UserDto implements Serializable{
 	private String password;
 	private String userId;
 	private String encryptedPassword;
+	List<AlbumResponseModel> albumResponseModelList;
+
+	public List<AlbumResponseModel> getAlbumResponseModelList() {
+		return albumResponseModelList;
+	}
+
+	public void setAlbumResponseModelList(List<AlbumResponseModel> albumResponseModelList) {
+		this.albumResponseModelList = albumResponseModelList;
+	}
 
 	public String getFirstName() {
 		return firstName;
