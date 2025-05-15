@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.dpkprojects.app.photoapp.api.users.data.clients.AlbumClientService;
 import com.dpkprojects.app.photoapp.api.users.ui.model.album.AlbumResponseModel;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -33,7 +34,8 @@ public class UserServiceImpl implements UserService {
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    RestTemplate restTemplate;
+    //RestTemplate restTemplate;
+	AlbumClientService albumClientService;
 
     @Autowired
     Environment environment;
@@ -65,11 +67,12 @@ public class UserServiceImpl implements UserService {
         if(userEntity == null){
             throw new UsernameNotFoundException("user not found..!");
         }
-        String albumsUrl = String.format(environment.getProperty("albums.url"),userId);
+       /* String albumsUrl = String.format(environment.getProperty("albums.url"),userId);
         ResponseEntity<List<AlbumResponseModel>> albumListResponse = restTemplate.exchange(albumsUrl,
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<AlbumResponseModel>>() {
         });
-        List<AlbumResponseModel> albumList = albumListResponse.getBody();
+        List<AlbumResponseModel> albumList = albumListResponse.getBody();*/
+		List<AlbumResponseModel> albumList = albumClientService.getAlbums(userId);
         UserDto userDto = new ModelMapper().map(userEntity,UserDto.class);
         userDto.setAlbumResponseModelList(albumList);
         return userDto;
