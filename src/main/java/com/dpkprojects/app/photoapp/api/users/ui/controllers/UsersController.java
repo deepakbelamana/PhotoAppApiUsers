@@ -53,6 +53,7 @@ public class UsersController {
 	public ResponseEntity<UserResponseModel> getUserDetails(@PathVariable String userId) {
 			UserDto userDto = userService.getUserByUserId(userId);
 			UserResponseModel userResponseModel = new ModelMapper().map(userDto,UserResponseModel.class);
+			userResponseModel.setAlbums(userDto.getAlbumResponseModelList());
 			return ResponseEntity.ok().body(userResponseModel);
 	}
 
