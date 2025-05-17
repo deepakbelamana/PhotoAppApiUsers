@@ -44,7 +44,7 @@ public class PhotoAppApiUsersApplication {
 	}
 
 	@Bean
-	FeignErrorDecoder feignErrorDecoder() {
+	public FeignErrorDecoder feignErrorDecoder() {
 		return new FeignErrorDecoder();
 	}
 
