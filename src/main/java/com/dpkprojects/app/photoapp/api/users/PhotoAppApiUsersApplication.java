@@ -1,5 +1,6 @@
 package com.dpkprojects.app.photoapp.api.users;
 
+import com.dpkprojects.app.photoapp.api.users.shared.FeignErrorDecoder;
 import feign.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
@@ -40,6 +41,11 @@ public class PhotoAppApiUsersApplication {
 	@Bean
 	Logger.Level feignClientLogger() {
 		return Logger.Level.FULL;
+	}
+
+	@Bean
+	FeignErrorDecoder feignErrorDecoder() {
+		return new FeignErrorDecoder();
 	}
 
 }
